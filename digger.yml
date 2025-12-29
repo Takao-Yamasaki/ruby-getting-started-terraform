@@ -1,0 +1,5 @@
+projects:
+  - name: ruby-getting-started-terraform
+    dir: .
+    opentofu: false
+    terraform: true

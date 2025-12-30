@@ -34,6 +34,10 @@ resource "aws_security_group" "bastion" {
     Environment = var.environment
     Project     = var.project_name
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Bastion用IAMロール

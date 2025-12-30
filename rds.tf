@@ -18,6 +18,10 @@ resource "aws_security_group" "rds" {
     Environment = var.environment
     Project     = var.project_name
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # RDSサブネットグループ
@@ -29,6 +33,10 @@ resource "aws_db_subnet_group" "main" {
     Name        = "${var.project_name}-rds-subnet-group"
     Environment = var.environment
     Project     = var.project_name
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -69,6 +77,10 @@ resource "aws_db_instance" "main" {
     Name        = "${var.project_name}-mysql"
     Environment = var.environment
     Project     = var.project_name
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

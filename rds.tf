@@ -1,6 +1,6 @@
 # RDS用セキュリティグループ
 resource "aws_security_group" "rds" {
-  name_prefix = "${var.project_name}-rds-sg-"
+  name        = "${var.project_name}-rds-sg"
   description = "Security group for RDS instance"
   vpc_id      = aws_vpc.main.id
 
@@ -22,8 +22,8 @@ resource "aws_security_group" "rds" {
 
 # RDSサブネットグループ
 resource "aws_db_subnet_group" "main" {
-  name_prefix = "${var.project_name}-rds-subnet-group-"
-  subnet_ids  = aws_subnet.rds[*].id
+  name       = "${var.project_name}-rds-subnet-group"
+  subnet_ids = aws_subnet.rds[*].id
 
   tags = {
     Name        = "${var.project_name}-rds-subnet-group"
@@ -34,11 +34,11 @@ resource "aws_db_subnet_group" "main" {
 
 # RDSインスタンス
 resource "aws_db_instance" "main" {
-  identifier_prefix = "${var.project_name}-mysql-"
+  identifier = "${var.project_name}-mysql"
 
   # エンジン設定
   engine         = "mysql"
-  engine_version = "8.0.35"
+  engine_version = "8.0.39"
 
   # インスタンススペック
   instance_class    = "db.t3.micro"
@@ -80,7 +80,7 @@ resource "random_password" "rds_password" {
 
 # パスワードをSecrets Managerに保存
 resource "aws_secretsmanager_secret" "rds_password" {
-  name_prefix = "${var.project_name}-rds-password-"
+  name        = "${var.project_name}-rds-password"
   description = "RDS master password"
 
   tags = {

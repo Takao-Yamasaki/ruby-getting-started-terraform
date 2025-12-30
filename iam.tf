@@ -16,7 +16,7 @@ module "github_oidc" {
 
 # Secrets Manager用のポリシー
 resource "aws_iam_policy" "secrets_manager" {
-  name_prefix = "${var.project_name}-secrets-manager-"
+  name        = "${var.project_name}-secrets-manager-policy"
   description = "Allow GitHub Actions to manage Secrets Manager secrets"
 
   policy = jsonencode({

@@ -31,7 +31,7 @@ resource "aws_subnet" "rds" {
   count             = length(var.rds_subnet_cidr)
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.rds_subnet_cidr[count.index]
-  availability_zone = "ap-northeast-1a"
+  availability_zone = count.index == 0 ? "ap-northeast-1a" : "ap-northeast-1c"
 
   tags = {
     Name        = "${var.project_name}-rds-subnet-${count.index + 1}"

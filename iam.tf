@@ -13,3 +13,34 @@ module "github_oidc" {
   repositories              = [local.repository_full_name]
   oidc_role_attach_policies = var.attach_policies
 }
+
+# Secrets Manager用のポリシー
+resource "aws_iam_policy" "secrets_manager" {
+  name_prefix = "${var.project_name}-secrets-manager-"
+  description = "Allow GitHub Actions to manage Secrets Manager secrets"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:CreateSecret",
+          "secretsmanager:DeleteSecret",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:PutSecretValue",
+          "secretsmanager:UpdateSecret",
+          "secretsmanager:TagResource"
+        ]
+        Resource = "arn:aws:secretsmanager:ap-northeast-1:*:secret:${var.project_name}-*"
+      }
+    ]
+  })
+}
+
+# GitHubActionsロールにSecrets Managerポリシーをアタッチ
+resource "aws_iam_role_policy_attachment" "github_actions_secrets_manager" {
+  role       = local.role_name
+  policy_arn = aws_iam_policy.secrets_manager.arn
+}

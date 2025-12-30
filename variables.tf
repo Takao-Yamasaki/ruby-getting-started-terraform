@@ -42,3 +42,21 @@ variable "backup_retention_days" {
   type        = number
   default     = 365
 }
+
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
+  type        = string
+  default     = "192.168.0.0/16"
+}
+
+variable "bastion_subnet_cidr" {
+  description = "CIDR blocks for bastion subnet"
+  type        = list(string)
+  default     = ["192.168.11.0/24"]
+}
+
+variable "rds_subnet_cidr" {
+  description = "CIDR blocks for RDS subnet"
+  type        = list(string)
+  default     = ["192.168.21.0/24"]
+}

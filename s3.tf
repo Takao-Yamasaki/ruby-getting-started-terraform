@@ -48,6 +48,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "rds_backup" {
     id     = "delete-old-backups"
     status = "Enabled"
 
+    filter {
+      prefix = ""
+    }
+
     expiration {
       days = var.backup_retention_days
     }

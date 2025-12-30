@@ -18,10 +18,6 @@
 #     Environment = var.environment
 #     Project     = var.project_name
 #   }
-#
-#   lifecycle {
-#     create_before_destroy = true
-#   }
 # }
 #
 # # RDSサブネットグループ
@@ -33,10 +29,6 @@
 #     Name        = "${var.project_name}-rds-subnet-group"
 #     Environment = var.environment
 #     Project     = var.project_name
-#   }
-#
-#   lifecycle {
-#     create_before_destroy = true
 #   }
 # }
 #
@@ -77,10 +69,6 @@
 #     Name        = "${var.project_name}-mysql"
 #     Environment = var.environment
 #     Project     = var.project_name
-#   }
-#
-#   lifecycle {
-#     create_before_destroy = true
 #   }
 # }
 #

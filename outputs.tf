@@ -26,18 +26,18 @@
 # output "connection_instructions" {
 #   description = "Instructions for connecting to RDS via SSM"
 #   value       = <<-EOT
-#     # 1. SSM経由でBastionに接続
+#     # 1. Connect to Bastion via SSM
 #     aws ssm start-session --target ${aws_instance.bastion.id}
 #
-#     # 2. RDS接続情報
+#     # 2. RDS connection information
 #     Database: ${aws_db_instance.main.db_name}
 #     Endpoint: ${aws_db_instance.main.address}
 #     Port: 3306
 #     Username: ${aws_db_instance.main.username}
 #
-#     # パスワード取得コマンド:
+#     # Retrieve password:
 #     aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.rds_password.id} --query SecretString --output text | jq -r .password
 #
-#     # 注意: プライベートサブネット内のため、MySQLクライアントのインストールにはNATゲートウェイまたはパブリックサブネット化が必要です
+#     # Note: MySQL client installation requires NAT Gateway or public subnet access since the bastion is in a private subnet.
 #   EOT
 # }

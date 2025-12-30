@@ -1,4 +1,4 @@
-# RDS Backup S3 Bucket
+# RDSバックアップ用S3バケット
 resource "aws_s3_bucket" "rds_backup" {
   bucket = local.rds_backup_bucket_name
 
@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "rds_backup" {
   }
 }
 
-# S3 Bucket Versioning
+# S3バケットバージョニング
 resource "aws_s3_bucket_versioning" "rds_backup" {
   bucket = aws_s3_bucket.rds_backup.id
 
@@ -19,7 +19,7 @@ resource "aws_s3_bucket_versioning" "rds_backup" {
   }
 }
 
-# S3 Bucket Encryption
+# S3バケット暗号化
 resource "aws_s3_bucket_server_side_encryption_configuration" "rds_backup" {
   bucket = aws_s3_bucket.rds_backup.id
 
@@ -30,7 +30,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "rds_backup" {
   }
 }
 
-# S3 Bucket Public Access Block
+# S3バケットパブリックアクセスブロック
 resource "aws_s3_bucket_public_access_block" "rds_backup" {
   bucket = aws_s3_bucket.rds_backup.id
 
@@ -40,7 +40,7 @@ resource "aws_s3_bucket_public_access_block" "rds_backup" {
   restrict_public_buckets = true
 }
 
-# S3 Bucket Lifecycle Policy
+# S3バケットライフサイクルポリシー
 resource "aws_s3_bucket_lifecycle_configuration" "rds_backup" {
   bucket = aws_s3_bucket.rds_backup.id
 
@@ -48,32 +48,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "rds_backup" {
     id     = "delete-old-backups"
     status = "Enabled"
 
-    transition {
-      days          = 30
-      storage_class = "STANDARD_IA"
-    }
-
-    transition {
-      days          = 90
-      storage_class = "GLACIER"
-    }
-
     expiration {
       days = var.backup_retention_days
     }
   }
-
-  rule {
-    id     = "delete-incomplete-multipart-uploads"
-    status = "Enabled"
-
-    abort_incomplete_multipart_upload {
-      days_after_initiation = 7
-    }
-  }
 }
 
-# S3 Bucket Policy for RDS
+# RDS用S3バケットポリシー
 resource "aws_s3_bucket_policy" "rds_backup" {
   bucket = aws_s3_bucket.rds_backup.id
 

@@ -16,7 +16,7 @@ data "aws_ami" "amazon_linux_2023" {
 
 # Bastion用セキュリティグループ
 resource "aws_security_group" "bastion" {
-  name_prefix = "${var.project_name}-bastion-sg-"
+  name        = "${var.project_name}-bastion-sg"
   description = "Security group for bastion host"
   vpc_id      = aws_vpc.main.id
 
@@ -38,7 +38,7 @@ resource "aws_security_group" "bastion" {
 
 # Bastion用IAMロール
 resource "aws_iam_role" "bastion" {
-  name_prefix = "${var.project_name}-bastion-role-"
+  name = "${var.project_name}-bastion-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -68,8 +68,8 @@ resource "aws_iam_role_policy_attachment" "bastion_ssm" {
 
 # Bastion用インスタンスプロファイル
 resource "aws_iam_instance_profile" "bastion" {
-  name_prefix = "${var.project_name}-bastion-profile-"
-  role        = aws_iam_role.bastion.name
+  name = "${var.project_name}-bastion-profile"
+  role = aws_iam_role.bastion.name
 
   tags = {
     Name        = "${var.project_name}-bastion-profile"

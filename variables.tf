@@ -58,5 +58,5 @@ variable "bastion_subnet_cidr" {
 variable "rds_subnet_cidr" {
   description = "CIDR blocks for RDS subnet"
   type        = list(string)
-  default     = ["192.168.21.0/24"]
+  default     = ["192.168.21.0/24", "192.168.22.0/24"]
 }

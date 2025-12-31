@@ -79,7 +79,7 @@ resource "aws_scheduler_schedule" "stop_rds" {
     role_arn = aws_iam_role.scheduler.arn
 
     input = jsonencode({
-      DBInstanceIdentifier = aws_db_instance.main.identifier
+      DbInstanceIdentifier = aws_db_instance.main.identifier
     })
   }
 

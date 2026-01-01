@@ -1,0 +1,66 @@
+# RDS バックアップ用KMSキー
+resource "aws_kms_key" "rds_backup" {
+  description             = "KMS key for RDS backup encryption"
+  deletion_window_in_days = 10
+  enable_key_rotation     = true
+
+  tags = {
+    Name        = "${var.project_name}-rds-backup-key"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+# KMSキーエイリアス
+resource "aws_kms_alias" "rds_backup" {
+  name          = "alias/${var.project_name}-rds-backup"
+  target_key_id = aws_kms_key.rds_backup.key_id
+}
+
+# KMSキーポリシー
+resource "aws_kms_key_policy" "rds_backup" {
+  key_id = aws_kms_key.rds_backup.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow RDS to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "export.rds.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+          "kms:CreateGrant"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow S3 to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "s3.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# 現在のAWSアカウント情報を取得
+data "aws_caller_identity" "current" {}

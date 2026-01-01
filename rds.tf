@@ -139,8 +139,9 @@ resource "aws_iam_role_policy" "rds_backup" {
         Action = [
           "s3:PutObject",
           "s3:GetObject",
+          "s3:DeleteObject",
           "s3:ListBucket",
-          "s3:DeleteObject"
+          "s3:GetBucketLocation"
         ]
         Resource = [
           aws_s3_bucket.rds_backup.arn,

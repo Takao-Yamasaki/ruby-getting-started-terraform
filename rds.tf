@@ -146,6 +146,16 @@ resource "aws_iam_role_policy" "rds_s3_export" {
           aws_s3_bucket.rds_backup.arn,
           "${aws_s3_bucket.rds_backup.arn}/*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+          "kms:CreateGrant",
+          "kms:DescribeKey"
+        ]
+        Resource = aws_kms_key.rds_s3_export.arn
       }
     ]
   })

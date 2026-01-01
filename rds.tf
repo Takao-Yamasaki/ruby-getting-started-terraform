@@ -101,3 +101,52 @@ resource "aws_secretsmanager_secret_version" "rds_password" {
     dbname   = aws_db_instance.main.db_name
   })
 }
+
+# RDS S3エクスポート用IAMロール
+resource "aws_iam_role" "rds_s3_export" {
+  name = "${var.project_name}-rds-s3-export-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "export.rds.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Name        = "${var.project_name}-rds-s3-export-role"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+# RDS S3エクスポート用ポリシー
+resource "aws_iam_role_policy" "rds_s3_export" {
+  name = "${var.project_name}-rds-s3-export-policy"
+  role = aws_iam_role.rds_s3_export.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          aws_s3_bucket.rds_backup.arn,
+          "${aws_s3_bucket.rds_backup.arn}/*"
+        ]
+      }
+    ]
+  })
+}

@@ -1,25 +1,25 @@
-# RDS S3エクスポート用KMSキー
-resource "aws_kms_key" "rds_s3_export" {
-  description             = "KMS key for RDS S3 export encryption"
+# RDS バックアップ用KMSキー
+resource "aws_kms_key" "rds_backup" {
+  description             = "KMS key for RDS backup encryption"
   deletion_window_in_days = 10
   enable_key_rotation     = true
 
   tags = {
-    Name        = "${var.project_name}-rds-s3-export-key"
+    Name        = "${var.project_name}-rds-backup-key"
     Environment = var.environment
     Project     = var.project_name
   }
 }
 
 # KMSキーエイリアス
-resource "aws_kms_alias" "rds_s3_export" {
-  name          = "alias/${var.project_name}-rds-s3-export"
-  target_key_id = aws_kms_key.rds_s3_export.key_id
+resource "aws_kms_alias" "rds_backup" {
+  name          = "alias/${var.project_name}-rds-backup"
+  target_key_id = aws_kms_key.rds_backup.key_id
 }
 
 # KMSキーポリシー
-resource "aws_kms_key_policy" "rds_s3_export" {
-  key_id = aws_kms_key.rds_s3_export.id
+resource "aws_kms_key_policy" "rds_backup" {
+  key_id = aws_kms_key.rds_backup.id
 
   policy = jsonencode({
     Version = "2012-10-17"

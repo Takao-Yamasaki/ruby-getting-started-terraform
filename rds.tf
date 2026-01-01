@@ -102,9 +102,9 @@ resource "aws_secretsmanager_secret_version" "rds_password" {
   })
 }
 
-# RDS S3エクスポート用IAMロール
-resource "aws_iam_role" "rds_s3_export" {
-  name = "${var.project_name}-rds-s3-export-role"
+# RDS バックアップ用IAMロール
+resource "aws_iam_role" "rds_backup" {
+  name = "${var.project_name}-rds-backup-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -120,16 +120,16 @@ resource "aws_iam_role" "rds_s3_export" {
   })
 
   tags = {
-    Name        = "${var.project_name}-rds-s3-export-role"
+    Name        = "${var.project_name}-rds-backup-role"
     Environment = var.environment
     Project     = var.project_name
   }
 }
 
-# RDS S3エクスポート用ポリシー
-resource "aws_iam_role_policy" "rds_s3_export" {
-  name = "${var.project_name}-rds-s3-export-policy"
-  role = aws_iam_role.rds_s3_export.id
+# RDS バックアップ用ポリシー
+resource "aws_iam_role_policy" "rds_backup" {
+  name = "${var.project_name}-rds-backup-policy"
+  role = aws_iam_role.rds_backup.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -155,7 +155,7 @@ resource "aws_iam_role_policy" "rds_s3_export" {
           "kms:CreateGrant",
           "kms:DescribeKey"
         ]
-        Resource = aws_kms_key.rds_s3_export.arn
+        Resource = aws_kms_key.rds_backup.arn
       }
     ]
   })

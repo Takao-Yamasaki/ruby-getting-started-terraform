@@ -1,6 +1,6 @@
 locals {
   role_name               = var.role_name != "" ? var.role_name : "${var.project_name}-github-actions-role"
-  rds_backup_bucket_name  = var.rds_backup_bucket_name != "" ? var.rds_backup_bucket_name : "${var.project_name}-rds-backup-20251230"
+  rds_backup_bucket_name  = var.rds_backup_bucket_name != "" ? var.rds_backup_bucket_name : "${var.project_name}-rds-backup"
   repository_full_name    = "${var.github_org}/${var.github_repo}"
 }
 

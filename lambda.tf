@@ -60,13 +60,12 @@ data "archive_file" "lambda" {
 
 # Lambda関数
 resource "aws_lambda_function" "lambda" {
-  filename = data.archive_file.lambda.output_path
-  function_name = "rds_s3_export"
-  role = aws_iam_role.lambda.arn
-  handler = "rds_s3_export.lambda_handler"
-  code_sha256 = data.archive_file.lambda.output_base64sha256
-  
-  runtime = "python3.12"
+  filename         = data.archive_file.lambda.output_path
+  function_name    = "rds_s3_export"
+  role             = aws_iam_role.lambda.arn
+  handler          = "rds_s3_export.lambda_handler"
+  source_code_hash = data.archive_file.lambda.output_base64sha256
+  runtime          = "python3.12"
   
   environment {
     variables = {

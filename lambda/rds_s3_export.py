@@ -18,7 +18,7 @@ def get_latest_snapshot(db_instance_identifier):
     try:
         response = rds_client.describe_db_snapshots(
             DBInstanceIdentifier=db_instance_identifier,
-            MaxRecords=7
+            MaxRecords=20
         )
 
         snapshots = response.get('DBSnapshots', [])

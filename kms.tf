@@ -34,6 +34,19 @@ resource "aws_kms_key_policy" "rds_backup" {
         Resource = "*"
       },
       {
+        Sid    = "Allow Lambda to use the key"
+        Effect = "Allow"
+        Principal = {
+          AWS = aws_iam_role.lambda.arn
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      },
+      {
         Sid    = "Allow RDS to use the key"
         Effect = "Allow"
         Principal = {

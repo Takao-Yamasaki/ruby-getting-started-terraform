@@ -40,10 +40,50 @@ resource "aws_iam_role_policy" "lambda" {
         Effect = "Allow"
         Action = [
           "iam:PassRole",
-          "rds:StartExportTask"
+          "rds:StartExportTask",
+          "rds:DescribeDBSnapshots",
+          "rds:DescribeDBInstances"
         ]
         Resource = "*"
       }
     ]
   })
+}
+
+# Lambda関数のデプロイパッケージ作成
+# Pythonファイルをzip形式にアーカイブしてLambdaにデプロイ可能な形式にする
+data "archive_file" "lambda" {
+  type        = "zip"
+  source_file = "${path.module}/lambda/rds_s3_export.py"
+  output_path = "${path.module}/lambda/rds_s3_export.zip"
+}
+
+# Lambda関数
+resource "aws_lambda_function" "lambda" {
+  filename = data.archive_file.lambda.output_path
+  function_name = "rds_s3_export"
+  role = aws_iam_role.lambda.arn
+  handler = "rds_s3_export.lambda_handler"
+  code_sha256 = data.archive_file.lambda.output_base64sha256
+  
+  runtime = "python3.12"
+  
+  environment {
+    variables = {
+      # RDSインスタンスの識別子
+      DB_INSTANCE_IDENTIFIER = aws_db_instance.main.identifier
+      # エクスポート先のS3バケット名
+      S3_BUCKET_NAME = aws_s3_bucket.rds_backup.bucket
+      # S3にエクスポート時に使用するIAMロールのARN
+      IAM_ROLE_ARN = aws_iam_role.rds_backup.arn
+      # 作成したKMSキーのARN
+      KMS_KEY_ID = aws_kms_key.rds_backup.arn
+    }
+  }
+
+  tags = {
+    Name        = "${var.project_name}-lambda-role"
+    Environment = var.environment
+    Project     = var.project_name
+  }
 }

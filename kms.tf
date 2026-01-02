@@ -47,25 +47,10 @@ resource "aws_kms_key_policy" "rds_backup" {
         Resource = "*"
       },
       {
-        Sid    = "Allow RDS Backup Role to use the key"
+        Sid    = "Allow RDS Export to use the key"
         Effect = "Allow"
         Principal = {
-          AWS = aws_iam_role.rds_backup.arn
-        }
-        Action = [
-          "kms:Decrypt",
-          "kms:Encrypt",
-          "kms:GenerateDataKey",
-          "kms:CreateGrant",
-          "kms:DescribeKey",
-          "kms:ReEncrypt*"
-        ]
-        Resource = "*"
-      },
-      {
-        Sid    = "Allow RDS Export Service to use the key"
-        Effect = "Allow"
-        Principal = {
+          AWS     = aws_iam_role.rds_backup.arn
           Service = "export.rds.amazonaws.com"
         }
         Action = [

@@ -45,15 +45,6 @@ resource "aws_iam_role_policy" "lambda" {
           "rds:DescribeDBInstances"
         ]
         Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey",
-          "kms:DescribeKey"
-        ]
-        Resource = aws_kms_key.rds_backup.arn
       }
     ]
   })

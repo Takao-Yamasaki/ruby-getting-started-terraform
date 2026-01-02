@@ -13,12 +13,11 @@ rds_client = boto3.client('rds')
 
 def get_latest_snapshot(db_instance_identifier):
     """
-    指定されたDBインスタンスの最新の手動スナップショットを取得
+    指定されたDBインスタンスの最新のスナップショット（自動・手動問わず）を取得
     """
     try:
         response = rds_client.describe_db_snapshots(
             DBInstanceIdentifier=db_instance_identifier,
-            SnapshotType='manual',
             MaxRecords=7
         )
 

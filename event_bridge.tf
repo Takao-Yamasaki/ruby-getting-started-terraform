@@ -22,7 +22,7 @@ resource "aws_iam_role" "scheduler" {
   }
 }
 
-# Scheduler用ポリシー（EC2とRDSの停止権限）
+# Scheduler用ポリシー（EC2とRDSの停止権限、Lambda実行権限）
 resource "aws_iam_role_policy" "scheduler" {
   name = "${var.project_name}-scheduler-policy"
   role = aws_iam_role.scheduler.id
@@ -37,6 +37,13 @@ resource "aws_iam_role_policy" "scheduler" {
           "rds:StopDBInstance"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Resource = aws_lambda_function.lambda.arn
       }
     ]
   })
@@ -84,4 +91,27 @@ resource "aws_scheduler_schedule" "stop_rds" {
   }
 
   description = "Stop RDS instance at 23:00 JST daily"
+}
+
+# EventBridgeルール（毎日午後1時JST = 午前4時UTC）
+resource "aws_cloudwatch_event_rule" "rds_s3_export" {
+  name                = "rds-s3-export-rules"
+  description         = "For RDS Backup"
+  schedule_expression = "cron(0 4 * * ? *)"
+}
+
+# EventBridgeターゲット
+resource "aws_cloudwatch_event_target" "rds_s3_export" {
+  rule      = aws_cloudwatch_event_rule.rds_s3_export.name
+  target_id = "${var.project_name}-lambda"
+  arn       = aws_lambda_function.lambda.arn
+}
+
+# Lambda関数にEventBridgeルールからの実行を許可
+resource "aws_lambda_permission" "allow_event_bridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.rds_s3_export.arn
 }

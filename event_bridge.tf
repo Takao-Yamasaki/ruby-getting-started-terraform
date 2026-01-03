@@ -93,25 +93,25 @@ resource "aws_scheduler_schedule" "stop_rds" {
   description = "Stop RDS instance at 23:00 JST daily"
 }
 
-# # EventBridge Rule
-# resource "aws_cloudwatch_event_rule" "rds_s3_export_legacy" {
-#   name                = "rds-s3-export-rules"
-#   description         = "For RDS Backup"
-#   schedule_expression = "cron(0 14 * * ? *)"
-# }
+# EventBridgeルール（毎日午後1時JST = 午前4時UTC）
+resource "aws_cloudwatch_event_rule" "rds_s3_export" {
+  name                = "rds-s3-export-rules"
+  description         = "For RDS Backup"
+  schedule_expression = "cron(0 4 * * ? *)"
+}
 
-# # EventBridge Target
-# resource "aws_cloudwatch_event_target" "rds_s3_export_legacy" {
-#   rule      = aws_cloudwatch_event_rule.rds_s3_export_legacy.name
-#   target_id = "rtozns1m5sk6vv1t5k9v"
-#   arn       = aws_lambda_function.lambda.arn
-# }
+# EventBridgeターゲット
+resource "aws_cloudwatch_event_target" "rds_s3_export" {
+  rule      = aws_cloudwatch_event_rule.rds_s3_export.name
+  target_id = "${var.project_name}-lambda"
+  arn       = aws_lambda_function.lambda.arn
+}
 
-# # Lambda関数にEventBridge Ruleからの実行を許可
-# resource "aws_lambda_permission" "allow_eventbridge_legacy" {
-#   statement_id  = "AllowExecutionFromEventBridgeLegacy"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.lambda.function_name
-#   principal     = "events.amazonaws.com"
-#   source_arn    = aws_cloudwatch_event_rule.rds_s3_export_legacy.arn
-# }
+# Lambda関数にEventBridgeルールからの実行を許可
+resource "aws_lambda_permission" "allow_event_bridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.rds_s3_export.arn
+}

@@ -61,7 +61,7 @@ data "archive_file" "lambda" {
 # Lambda関数
 resource "aws_lambda_function" "lambda" {
   filename         = data.archive_file.lambda.output_path
-  function_name    = "rds_s3_export"
+  function_name    = "rds_s3_export_function"
   role             = aws_iam_role.lambda.arn
   handler          = "rds_s3_export.lambda_handler"
   source_code_hash = data.archive_file.lambda.output_base64sha256

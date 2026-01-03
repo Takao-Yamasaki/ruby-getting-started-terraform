@@ -46,7 +46,8 @@ resource "aws_kms_key_policy" "rds_backup" {
         Action = [
           "kms:Decrypt",
           "kms:GenerateDataKey",
-          "kms:CreateGrant"
+          "kms:CreateGrant",
+          "kms:DescribeKey"
         ]
         Resource = "*"
       },

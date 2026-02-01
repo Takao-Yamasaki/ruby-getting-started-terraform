@@ -22,6 +22,13 @@ output "rds_password_secret_arn" {
   value       = aws_secretsmanager_secret.rds_password.arn
 }
 
+# Bastion SSH秘密鍵
+output "bastion_private_key" {
+  description = "Private key for SSH access to bastion host"
+  value       = tls_private_key.bastion.private_key_pem
+  sensitive   = true
+}
+
 # SSM経由でのRDS接続方法
 output "connection_instructions" {
   description = "Instructions for connecting to RDS via SSM"

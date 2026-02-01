@@ -87,6 +87,23 @@ resource "aws_iam_instance_profile" "bastion" {
   }
 }
 
+# Bastion用SSHキーペア
+resource "tls_private_key" "bastion" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "bastion" {
+  key_name   = "${var.project_name}-bastion-key"
+  public_key = tls_private_key.bastion.public_key_openssh
+
+  tags = {
+    Name        = "${var.project_name}-bastion-key"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
 # Bastion EC2インスタンス
 resource "aws_instance" "bastion" {
   ami                         = data.aws_ami.amazon_linux_2023.id
@@ -95,6 +112,7 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids      = [aws_security_group.bastion.id]
   iam_instance_profile        = aws_iam_instance_profile.bastion.name
   associate_public_ip_address = true
+  key_name                    = aws_key_pair.bastion.key_name
 
   user_data = <<-EOF
   #!/bin/bash

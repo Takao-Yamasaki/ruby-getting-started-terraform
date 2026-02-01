@@ -97,8 +97,8 @@ resource "aws_instance" "bastion" {
   associate_public_ip_address = true
 
   user_data = <<-EOF
-    #!/bin/bash
-    yum install -y ec2-instance-connect
+  #!/bin/bash
+  yum install -y ec2-instance-connect
   EOF
 
   root_block_device {

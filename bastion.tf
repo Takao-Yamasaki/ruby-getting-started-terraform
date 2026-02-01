@@ -116,7 +116,8 @@ resource "aws_instance" "bastion" {
 
   user_data = <<-EOF
   #!/bin/bash
-  yum install -y ec2-instance-connect
+  dnf -y install https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
+  dnf -y install mysql-community-client
   EOF
 
   root_block_device {

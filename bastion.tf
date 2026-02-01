@@ -118,6 +118,7 @@ resource "aws_instance" "bastion" {
   #!/bin/bash
   dnf -y localinstall https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
   dnf -y install mysql-community-client
+  dnf -y install git
   EOF
 
   root_block_device {

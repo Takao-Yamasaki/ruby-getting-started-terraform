@@ -96,6 +96,11 @@ resource "aws_instance" "bastion" {
   iam_instance_profile        = aws_iam_instance_profile.bastion.name
   associate_public_ip_address = true
 
+  user_data = <<-EOF
+    #!/bin/bash
+    yum install -y ec2-instance-connect
+  EOF
+
   root_block_device {
     volume_type           = "gp3"
     volume_size           = 30

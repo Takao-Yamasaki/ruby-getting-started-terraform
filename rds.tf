@@ -38,7 +38,7 @@ resource "aws_db_instance" "main" {
 
   # エンジン設定
   engine         = "mysql"
-  engine_version = "8.0.39"
+  engine_version = "8.0.41"
 
   # インスタンススペック
   instance_class    = "db.t3.micro"

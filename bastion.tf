@@ -116,7 +116,7 @@ resource "aws_instance" "bastion" {
 
   user_data = <<-EOF
   #!/bin/bash
-  dnf -y install https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
+  dnf -y localinstall https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
   dnf -y install mysql-community-client
   EOF
 

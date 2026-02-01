@@ -20,13 +20,22 @@ resource "aws_security_group" "bastion" {
   description = "Security group for bastion host"
   vpc_id      = aws_vpc.main.id
 
-  # アウトバウンドルール（VPC内のRDSへの接続を許可）
+  # EC2 Instance Connect からのSSH接続を許可（ap-northeast-1）
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["3.112.23.0/29"]
+    description = "Allow SSH from EC2 Instance Connect"
+  }
+
+  # アウトバウンドルール
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [var.vpc_cidr]
-    description = "Allow all outbound traffic within VPC"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
   }
 
   tags = {

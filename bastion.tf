@@ -75,6 +75,50 @@ resource "aws_iam_role_policy_attachment" "bastion_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+# SSM Session Manager用ポリシー
+resource "aws_iam_role_policy" "bastion_ssm_session" {
+  name = "${var.project_name}-bastion-ssm-session-policy"
+  role = aws_iam_role.bastion.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = ["ssm:StartSession"]
+        Resource = [
+          "arn:aws:ec2:ap-northeast-1:${data.aws_caller_identity.current.account_id}:instance/${aws_instance.bastion.id}",
+          "arn:aws:ssm:ap-northeast-1:${data.aws_caller_identity.current.account_id}:document/SSM-SessionManagerRunShell"
+        ]
+        Condition = {
+          BoolIfExists = {
+            "ssm:SessionDocumentAccessCheck" = "true"
+          }
+        }
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:DescribeSessions",
+          "ssm:GetConnectionStatus",
+          "ssm:DescribeInstanceProperties",
+          "ssm:DescribeInstanceInformation",
+          "ec2:DescribeInstances"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:TerminateSession",
+          "ssm:ResumeSession"
+        ]
+        Resource = ["arn:aws:ssm:*:*:session/$${aws:username}-*"]
+      }
+    ]
+  })
+}
+
 # Bastion用インスタンスプロファイル
 resource "aws_iam_instance_profile" "bastion" {
   name = "${var.project_name}-bastion-profile"

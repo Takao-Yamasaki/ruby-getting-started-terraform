@@ -1,3 +1,4 @@
+/*
 # RDS用セキュリティグループ
 resource "aws_security_group" "rds" {
   name        = "${var.project_name}-rds-sg"
@@ -161,3 +162,4 @@ resource "aws_iam_role_policy" "rds_backup" {
     ]
   })
 }
+*/

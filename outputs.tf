@@ -4,6 +4,7 @@ output "bastion_instance_id" {
   value       = aws_instance.bastion.id
 }
 
+/*
 # RDSエンドポイント
 output "rds_endpoint" {
   description = "RDS instance endpoint"
@@ -21,6 +22,7 @@ output "rds_password_secret_arn" {
   description = "ARN of the secret containing RDS credentials"
   value       = aws_secretsmanager_secret.rds_password.arn
 }
+*/
 
 # Bastion SSH秘密鍵
 output "bastion_private_key" {
@@ -29,6 +31,7 @@ output "bastion_private_key" {
   sensitive   = true
 }
 
+/*
 # SSM経由でのRDS接続方法
 output "connection_instructions" {
   description = "Instructions for connecting to RDS via SSM"
@@ -48,3 +51,4 @@ output "connection_instructions" {
     # Note: MySQL client installation requires NAT Gateway or public subnet access since the bastion is in a private subnet.
   EOT
 }
+*/

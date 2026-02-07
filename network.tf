@@ -38,6 +38,7 @@ resource "aws_subnet" "bastion" {
   }
 }
 
+/*
 # RDS用プライベートサブネット
 resource "aws_subnet" "rds" {
   count             = length(var.rds_subnet_cidr)
@@ -52,6 +53,7 @@ resource "aws_subnet" "rds" {
     Type        = "Private-RDS"
   }
 }
+*/
 
 # Bastion用パブリックルートテーブル
 resource "aws_route_table" "bastion" {
@@ -66,6 +68,7 @@ resource "aws_route_table" "bastion" {
   }
 }
 
+/*
 # RDS用プライベートルートテーブル
 resource "aws_route_table" "rds" {
   count  = length(var.rds_subnet_cidr)
@@ -78,6 +81,7 @@ resource "aws_route_table" "rds" {
     Type        = "Private-RDS"
   }
 }
+*/
 
 # Bastionルートテーブルにインターネットへのルートを追加
 resource "aws_route" "bastion_internet" {
@@ -94,9 +98,11 @@ resource "aws_route_table_association" "bastion" {
   route_table_id = aws_route_table.bastion[count.index].id
 }
 
+/*
 # RDSサブネットとルートテーブルの関連付け
 resource "aws_route_table_association" "rds" {
   count          = length(var.rds_subnet_cidr)
   subnet_id      = aws_subnet.rds[count.index].id
   route_table_id = aws_route_table.rds[count.index].id
 }
+*/

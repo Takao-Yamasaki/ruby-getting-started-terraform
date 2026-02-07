@@ -1,3 +1,4 @@
+/*
 # RDS バックアップ用KMSキー
 resource "aws_kms_key" "rds_backup" {
   description             = "KMS key for RDS backup encryption"
@@ -63,3 +64,4 @@ resource "aws_kms_key_policy" "rds_backup" {
 
 # 現在のAWSアカウント情報を取得
 data "aws_caller_identity" "current" {}
+*/

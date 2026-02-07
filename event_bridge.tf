@@ -22,7 +22,7 @@ resource "aws_iam_role" "scheduler" {
   }
 }
 
-# Scheduler用ポリシー（EC2とRDSの停止権限、Lambda実行権限）
+# Scheduler用ポリシー（EC2の停止権限）
 resource "aws_iam_role_policy" "scheduler" {
   name = "${var.project_name}-scheduler-policy"
   role = aws_iam_role.scheduler.id
@@ -33,17 +33,9 @@ resource "aws_iam_role_policy" "scheduler" {
       {
         Effect = "Allow"
         Action = [
-          "ec2:StopInstances",
-          "rds:StopDBInstance"
+          "ec2:StopInstances"
         ]
         Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "lambda:InvokeFunction"
-        ]
-        Resource = aws_lambda_function.lambda.arn
       }
     ]
   })
@@ -71,6 +63,7 @@ resource "aws_scheduler_schedule" "stop_bastion" {
   description = "Stop Bastion EC2 instance at 23:00 JST daily"
 }
 
+/*
 # RDS停止スケジュール（毎晩23時JST = 14時UTC）
 resource "aws_scheduler_schedule" "stop_rds" {
   name = "${var.project_name}-stop-rds"
@@ -115,3 +108,4 @@ resource "aws_lambda_permission" "allow_event_bridge" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.rds_s3_export.arn
 }
+*/

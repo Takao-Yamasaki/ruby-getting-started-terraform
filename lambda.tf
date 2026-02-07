@@ -1,3 +1,4 @@
+/*
 # Lambda用のIAMロール
 resource "aws_iam_role" "lambda" {
   name = "${var.project_name}-lambda-role"
@@ -66,7 +67,7 @@ resource "aws_lambda_function" "lambda" {
   handler          = "rds_s3_export.lambda_handler"
   source_code_hash = data.archive_file.lambda.output_base64sha256
   runtime          = "python3.11"
-  
+
   environment {
     variables = {
       # RDSインスタンスの識別子
@@ -86,3 +87,4 @@ resource "aws_lambda_function" "lambda" {
     Project     = var.project_name
   }
 }
+*/

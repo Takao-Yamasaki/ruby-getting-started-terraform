@@ -5,7 +5,7 @@ resource "aws_subnet" "opensearch" {
   count             = length(var.opensearch_subnet_cidr)
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.opensearch_subnet_cidr[count.index]
-  availability_zone = count.index == 0 ? "ap-northeast-1a" : "ap-northeast-1c"
+  availability_zone = "ap-northeast-1a"
 
   tags = {
     Name        = "${var.project_name}-opensearch-subnet-${count.index + 1}"
@@ -13,6 +13,25 @@ resource "aws_subnet" "opensearch" {
     Project     = var.project_name
     Type        = "Private-OpenSearch"
   }
+}
+
+# OpenSearch用プライベートルートテーブル
+resource "aws_route_table" "opensearch" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name        = "${var.project_name}-opensearch-rt"
+    Environment = var.environment
+    Project     = var.project_name
+    Type        = "Private-OpenSearch"
+  }
+}
+
+# OpenSearchサブネットとルートテーブルの関連付け
+resource "aws_route_table_association" "opensearch" {
+  count          = length(var.opensearch_subnet_cidr)
+  subnet_id      = aws_subnet.opensearch[count.index].id
+  route_table_id = aws_route_table.opensearch.id
 }
 
 # OpenSearch用セキュリティグループ

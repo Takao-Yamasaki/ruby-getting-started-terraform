@@ -40,13 +40,13 @@ resource "aws_security_group" "opensearch" {
   description = "Security group for OpenSearch domain"
   vpc_id      = aws_vpc.main.id
 
-  # 踏み台からのHTTPS接続を許可
+  # 踏み台からの全通信を許可
   ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
     security_groups = [aws_security_group.bastion.id]
-    description     = "Allow HTTPS from bastion"
+    description     = "Allow all traffic from bastion"
   }
 
   # アウトバウンドルール

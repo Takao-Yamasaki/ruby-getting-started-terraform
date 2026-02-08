@@ -29,6 +29,15 @@ resource "aws_security_group" "bastion" {
     description = "Allow SSH from anywhere"
   }
 
+  # OpenSearch Dashboards用ポートフォワーディング
+  ingress {
+    from_port   = 8157
+    to_port     = 8157
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow port forwarding for OpenSearch Dashboards"
+  }
+
   # アウトバウンドルール
   egress {
     from_port   = 0

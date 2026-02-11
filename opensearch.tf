@@ -64,3 +64,61 @@ resource "aws_security_group" "opensearch" {
     Project     = var.project_name
   }
 }
+
+# OpenSearchドメイン
+resource "aws_opensearch_domain" "opensearch" {
+  domain_name    = "ruby-getting-started"
+  engine_version = "OpenSearch_3.3"
+
+  access_policies = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "es:*"
+      Effect    = "Allow"
+      Principal = { AWS = "*" }
+      Resource  = "arn:aws:es:ap-northeast-1:786832920677:domain/ruby-getting-started/*"
+    }]
+  })
+
+  advanced_options = {
+    "indices.fielddata.cache.size"        = "20"
+    "indices.query.bool.max_clause_count" = "1024"
+  }
+
+  cluster_config {
+    instance_count = 1
+    instance_type  = "t3.small.search"
+  }
+
+  ebs_options {
+    ebs_enabled = true
+    iops        = 3000
+    throughput  = 125
+    volume_size = 10
+    volume_type = "gp3"
+  }
+
+  encrypt_at_rest {
+    enabled    = true
+    kms_key_id = "arn:aws:kms:ap-northeast-1:786832920677:key/538fdcc0-9cdc-4abf-9815-dee3d8e4ef4b"
+  }
+
+  node_to_node_encryption {
+    enabled = true
+  }
+
+  advanced_security_options {
+    enabled                        = true
+    internal_user_database_enabled = true
+  }
+
+  domain_endpoint_options {
+    enforce_https       = true
+    tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
+  }
+
+  vpc_options {
+    security_group_ids = [aws_security_group.opensearch.id]
+    subnet_ids         = [aws_subnet.opensearch[0].id]
+  }
+}

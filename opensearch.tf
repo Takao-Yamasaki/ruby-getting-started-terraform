@@ -1,11 +1,14 @@
 # OpenSearch
 
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 # OpenSearch用プライベートサブネット
 resource "aws_subnet" "opensearch" {
   count             = length(var.opensearch_subnet_cidr)
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.opensearch_subnet_cidr[count.index]
-  availability_zone = "ap-northeast-1a"
+  availability_zone = "${data.aws_region.current.name}a"
 
   tags = {
     Name        = "${var.project_name}-opensearch-subnet-${count.index + 1}"
@@ -65,19 +68,19 @@ resource "aws_security_group" "opensearch" {
   }
 }
 
-# OpenSearchドメイン
 resource "aws_opensearch_domain" "opensearch" {
-  domain_name    = "ruby-getting-started"
-  engine_version = "OpenSearch_3.3"
-
   access_policies = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Action    = "es:*"
-      Effect    = "Allow"
-      Principal = { AWS = "*" }
-      Resource  = "arn:aws:es:ap-northeast-1:786832920677:domain/ruby-getting-started/*"
-    }]
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "*"
+        }
+        Action   = "es:*"
+        Resource = "arn:aws:es:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:domain/ruby-getting-started/*"
+      }
+    ]
   })
 
   advanced_options = {
@@ -85,9 +88,23 @@ resource "aws_opensearch_domain" "opensearch" {
     "indices.query.bool.max_clause_count" = "1024"
   }
 
+  domain_name    = "ruby-getting-started"
+  engine_version = "OpenSearch_3.3"
+
+  advanced_security_options {
+    anonymous_auth_enabled         = false
+    enabled                        = true
+    internal_user_database_enabled = true
+  }
+
   cluster_config {
     instance_count = 1
     instance_type  = "t3.small.search"
+  }
+
+  domain_endpoint_options {
+    enforce_https       = true
+    tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
   }
 
   ebs_options {
@@ -100,25 +117,15 @@ resource "aws_opensearch_domain" "opensearch" {
 
   encrypt_at_rest {
     enabled    = true
-    kms_key_id = "arn:aws:kms:ap-northeast-1:786832920677:key/538fdcc0-9cdc-4abf-9815-dee3d8e4ef4b"
+    kms_key_id = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/538fdcc0-9cdc-4abf-9815-dee3d8e4ef4b"
   }
 
   node_to_node_encryption {
     enabled = true
   }
 
-  advanced_security_options {
-    enabled                        = true
-    internal_user_database_enabled = true
-  }
-
-  domain_endpoint_options {
-    enforce_https       = true
-    tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
-  }
-
   vpc_options {
     security_group_ids = [aws_security_group.opensearch.id]
-    subnet_ids         = [aws_subnet.opensearch[0].id]
+    subnet_ids         = aws_subnet.opensearch[*].id
   }
 }

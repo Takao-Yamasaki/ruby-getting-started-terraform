@@ -1,3 +1,4 @@
+/*
 # RDSバックアップ用S3バケット
 resource "aws_s3_bucket" "rds_backup" {
   bucket = local.rds_backup_bucket_name
@@ -90,3 +91,4 @@ resource "aws_s3_bucket_policy" "rds_backup" {
     ]
   })
 }
+*/

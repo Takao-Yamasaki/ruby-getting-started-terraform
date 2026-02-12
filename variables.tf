@@ -60,3 +60,9 @@ variable "rds_subnet_cidr" {
   type        = list(string)
   default     = ["192.168.21.0/24", "192.168.22.0/24"]
 }
+
+variable "opensearch_subnet_cidr" {
+  description = "CIDR blocks for OpenSearch subnet"
+  type        = list(string)
+  default     = ["192.168.31.0/24"]
+}

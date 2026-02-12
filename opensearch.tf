@@ -117,7 +117,7 @@ resource "aws_opensearch_domain" "opensearch" {
 
   encrypt_at_rest {
     enabled    = true
-    kms_key_id = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/538fdcc0-9cdc-4abf-9815-dee3d8e4ef4b"
+    kms_key_id = aws_kms_key.opensearch.arn
   }
 
   node_to_node_encryption {

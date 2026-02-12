@@ -65,3 +65,16 @@ resource "aws_kms_key_policy" "rds_backup" {
 # 現在のAWSアカウント情報を取得
 data "aws_caller_identity" "current" {}
 */
+
+# OpenSearch 暗号化用KMSキー（AWS側で作成済みのキーをimport）
+resource "aws_kms_key" "opensearch" {
+  description          = "Default key that protects my Amazon OpenSearch Service (successor to Amazon Elasticsearch Service) data when no other key is defined"
+  enable_key_rotation  = true
+}
+
+import {
+  to = aws_kms_key.opensearch
+  id = "538fdcc0-9cdc-4abf-9815-dee3d8e4ef4b"
+}
+
+

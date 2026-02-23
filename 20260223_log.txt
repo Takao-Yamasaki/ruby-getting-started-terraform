@@ -1,0 +1,113 @@
+========================================
+日付: 2026-02-23
+========================================
+
+【プロンプト 3】
+表示させるのはリソース名とIPアドレスだけにして、リソース名はアイコンと重ならないようにアイコンの下に表示させて
+
+【実行内容】
+構成図を以下の方針で再作成:
+- 各アイコンのラベルをリソース名のみに簡略化
+- サブネットはリソース名 + CIDRのみ表示
+- 詳細情報 (インスタンスタイプ・ストレージ・SG情報等) を削除
+- アイコンラベルを verticalLabelPosition=bottom でアイコン下部に配置
+
+【出力結果】
+シンプル化した draw.io 構成図を作成しました。
+
+========================================
+
+【プロンプト 2】
+計画中リソースも含めて構成図を更新してください
+
+【実行内容】
+計画中 (コメントアウト) リソースを追加した draw.io 構成図を再作成
+
+追加した計画中リソース:
+- プライベートサブネット (RDS): 192.168.21.0/24 (ap-northeast-1a), 192.168.22.0/24 (ap-northeast-1c)
+- RDS MySQL 8.0.41 (db.t3.micro, 20GB gp3)
+- Secrets Manager (RDS認証情報)
+- S3 Bucket (RDSバックアップ, 365日ライフサイクル)
+- Lambda Function (rds_s3_export, Python 3.11)
+- KMS Key (RDSバックアップ暗号化)
+- EventBridge Rule (Lambda起動スケジュール, 毎日13:00 JST)
+- IAM Role (Lambda用: rds:StartExportTask, iam:PassRole)
+
+凡例:
+- 通常表示 = 有効なリソース
+- グレー/破線表示 = 計画中 (コメントアウト)
+
+【出力結果】
+計画中リソースをグレー・破線で区別した draw.io 構成図を作成しました。
+
+========================================
+
+【プロンプト】
+draw.io を使用してterraformのコードを基に構成図にしてください
+
+【実行コマンド】
+- Terraformコードの全ファイルを調査 (Explore Agent使用)
+- draw.ioでAWS構成図を作成
+
+【調査結果】
+
+■ プロジェクト概要
+- プロジェクト名: ruby-getting-started
+- リージョン: ap-northeast-1 (東京)
+- バックエンド: Terraform Cloud
+
+■ ネットワーク
+- VPC: 192.168.0.0/16
+- Internet Gateway: aws_internet_gateway.main
+
+■ サブネット (有効)
+- パブリック Bastion サブネット: 192.168.11.0/24 (ap-northeast-1a)
+- プライベート OpenSearch サブネット: 192.168.31.0/24 (ap-northeast-1a)
+
+■ サブネット (コメントアウト/計画中)
+- プライベート RDS サブネット: 192.168.21.0/24 (ap-northeast-1a)
+- プライベート RDS サブネット: 192.168.22.0/24 (ap-northeast-1c)
+
+■ コンピューティング
+- Bastion EC2: t3.micro, Amazon Linux 2023, 30GB gp3 (暗号化)
+  - SG: TCP 22 (SSH) 0.0.0.0/0, TCP 8157 (OpenSearch Proxy) 0.0.0.0/0
+  - IAM: AmazonSSMManagedInstanceCore
+  - IMDSv2 強制
+
+■ 検索・分析
+- OpenSearch Domain: ruby-getting-started
+  - エンジン: OpenSearch 3.3
+  - インスタンス: t3.small.search
+  - ストレージ: 10GB gp3 (3000 IOPS, 125 MB/s)
+  - SG: HTTPS(443) Bastionからのみ
+  - 暗号化: KMS + TLS 1.2+ + Node間暗号化
+
+■ スケジューリング
+- EventBridge Scheduler: 毎日 23:00 JST (cron(0 14 * * ? *)) にBastionを停止
+  - IAM Role: ec2:StopInstances 権限
+
+■ 暗号化
+- KMS Key: OpenSearch暗号化 (インポート済み: 538fdcc0-9cdc-4abf-9815-dee3d8e4ef4b)
+  - キーローテーション: 有効
+
+■ CI/CD
+- GitHub Actions OIDC: terraform-module/github-oidc-provider/aws
+  - リポジトリ: Takao-Yamasaki/ruby-getting-started-terraform
+  - IAM Role: ruby-getting-started-terraform-github-actions-role
+  - 権限: AdministratorAccess, IAMFullAccess, AmazonS3FullAccess 等
+
+■ コメントアウト中 (計画中) のリソース
+- RDS MySQL 8.0.41 (db.t3.micro, 20GB gp3)
+- Secrets Manager (RDS認証情報)
+- S3 Bucket (RDSバックアップ, 365日ライフサイクル)
+- Lambda Function (RDS→S3エクスポート, Python 3.11)
+- KMS Key (RDSバックアップ暗号化)
+- EventBridge Rule (Lambda起動スケジュール)
+
+【出力結果】
+draw.io にて AWS構成図を作成しました。
+- AWSの公式アイコン (AWS4 ライブラリ) を使用
+- 有効なリソースを中心に構成図を作成
+- VPC・サブネット・セキュリティグループの境界を明示
+- EventBridge Scheduler・KMS・IAM Role等の関連サービスも記載
+========================================

@@ -1,0 +1,62 @@
+================================================================================
+日時: 2026-04-27
+================================================================================
+
+【プロンプト】
+GHAでCloudFrontのキャッシュ削除をしたい。検証用のCloudFrontとGHA用のIAMロールを作成して
+
+【実行内容】
+既存のTerraformファイルを調査し、以下のリソースを追加した。
+
+1. cloudfront.tf (新規作成)
+   - aws_s3_bucket.cloudfront_origin: S3バケット（CloudFront Origin用）
+   - aws_s3_bucket_public_access_block.cloudfront_origin: パブリックアクセスブロック
+   - aws_cloudfront_origin_access_control.main: OAC（Origin Access Control）
+   - aws_cloudfront_distribution.staging: CloudFrontディストリビューション（検証用）
+   - aws_s3_bucket_policy.cloudfront_origin: S3バケットポリシー（CloudFrontからのアクセス許可）
+
+2. iam.tf (追記)
+   - data.aws_caller_identity.current: AWSアカウントID取得用データソース
+   - aws_iam_role.github_actions_cloudfront: CloudFrontキャッシュ削除専用GHAロール（最小権限）
+     Trust Policy: GitHub Actions OIDC (token.actions.githubusercontent.com)
+     条件: repo:Takao-Yamasaki/ruby-getting-started-terraform:*
+   - aws_iam_policy.cloudfront_invalidation: CloudFrontキャッシュ削除ポリシー
+     許可アクション: cloudfront:CreateInvalidation, cloudfront:GetInvalidation, cloudfront:ListInvalidations
+     対象リソース: staging CloudFrontディストリビューションのみ
+   - aws_iam_role_policy_attachment.github_actions_cloudfront: ロールへのポリシーアタッチ
+
+3. outputs.tf (追記)
+   - cloudfront_distribution_id: CloudFront ディストリビューションID（GHAで使用）
+   - cloudfront_domain_name: CloudFrontドメイン名
+   - gha_cloudfront_role_arn: GHA CloudFront専用ロールARN（GHAのrole-to-assumeに設定）
+
+【調査したファイル】
+- iam.tf
+- provider.tf
+- variables.tf
+- s3.tf
+- terraform.tfvars
+- outputs.tf
+- .terraform/modules/github_oidc/outputs.tf
+
+【GHA Workflowでの使用方法】
+以下のstepをGitHub Actionsワークフローに追加する:
+
+  - name: Configure AWS credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: <gha_cloudfront_role_arn のoutput値>
+      aws-region: ap-northeast-1
+
+  - name: Invalidate CloudFront cache
+    run: |
+      aws cloudfront create-invalidation \
+        --distribution-id <cloudfront_distribution_id のoutput値> \
+        --paths "/*"
+
+【出力結果】
+- cloudfront.tf: 新規作成完了
+- iam.tf: 追記完了
+- outputs.tf: 追記完了
+
+================================================================================

@@ -1,6 +1,5 @@
 # OpenSearch
 
-data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 # OpenSearch用プライベートサブネット
@@ -95,6 +94,11 @@ resource "aws_opensearch_domain" "opensearch" {
     anonymous_auth_enabled         = false
     enabled                        = true
     internal_user_database_enabled = true
+
+    master_user_options {
+      master_user_name     = var.opensearch_master_username
+      master_user_password = var.opensearch_master_password
+    }
   }
 
   cluster_config {

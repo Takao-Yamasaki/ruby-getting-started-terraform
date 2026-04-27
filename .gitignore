@@ -2,3 +2,4 @@
 .terraform.lock.hcl
 errored.tfstate
 lambda/rds_s3_export.zip
+terraform.tfvars

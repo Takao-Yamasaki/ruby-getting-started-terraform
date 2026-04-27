@@ -66,3 +66,15 @@ variable "opensearch_subnet_cidr" {
   type        = list(string)
   default     = ["192.168.31.0/24"]
 }
+
+variable "opensearch_master_username" {
+  description = "Master username for OpenSearch internal user database"
+  type        = string
+  sensitive   = true
+}
+
+variable "opensearch_master_password" {
+  description = "Master password for OpenSearch internal user database"
+  type        = string
+  sensitive   = true
+}

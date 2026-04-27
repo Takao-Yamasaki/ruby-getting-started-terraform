@@ -1,4 +1,6 @@
 project_name    = "ruby-getting-started"
+opensearch_master_username = "root"
+opensearch_master_password = "z2j8^Jdt"
 github_org      = "Takao-Yamasaki"
 github_repo     = "ruby-getting-started-terraform"
 role_name       = "ruby-getting-started-terraform-github-actions-role"

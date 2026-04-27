@@ -1,3 +1,21 @@
+# CloudFrontディストリビューションID（GHAのinvalidationコマンドで使用）
+output "cloudfront_distribution_id" {
+  description = "CloudFront distribution ID for cache invalidation"
+  value       = aws_cloudfront_distribution.staging.id
+}
+
+# CloudFrontドメイン名
+output "cloudfront_domain_name" {
+  description = "CloudFront distribution domain name"
+  value       = aws_cloudfront_distribution.staging.domain_name
+}
+
+# GHA CloudFrontキャッシュ削除用ロールARN
+output "gha_cloudfront_role_arn" {
+  description = "IAM role ARN for GitHub Actions CloudFront cache invalidation"
+  value       = aws_iam_role.github_actions_cloudfront.arn
+}
+
 # Bastion EC2インスタンスID
 output "bastion_instance_id" {
   description = "Bastion EC2 instance ID for SSM connection"
